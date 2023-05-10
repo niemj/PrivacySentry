@@ -18,10 +18,17 @@ class PrivacyProxyUtil {
             bVisitorModel: Boolean = false,
             bCache: Boolean = false
         ) {
+
+            var msg = PrivacyUtil.Util.getStackTrace()
+            if (bVisitorModel) {
+                PrivacySentry.Privacy.getBuilder()?.getVisitorCallBack()
+                    ?.onVisitorCallBack(funName, methodDocumentDesc, msg)
+                return
+            }
+
             var funName = funName + "-\n线程名: ${Thread.currentThread().name}"
             var funAlias =
                 (if (bCache) "命中缓存--" else "") + methodDocumentDesc + if (args?.isNotEmpty() == true) "--参数: $args" else ""
-            var msg = PrivacyUtil.Util.getStackTrace()
 
             // 这里不再拦截，交给printer自己拦截
             if (!PrivacySentry.Privacy.hasInit()) {

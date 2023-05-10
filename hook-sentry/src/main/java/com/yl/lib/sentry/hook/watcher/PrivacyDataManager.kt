@@ -19,6 +19,7 @@ class PrivacyDataManager {
         private var liveItemPrivacy: MutableLiveData<PrivacyFunBean> = MutableLiveData()
 
         private var stickFunBeanList: CopyOnWriteArrayList<PrivacyFunBean> = CopyOnWriteArrayList()
+
         fun addData(bean: PrivacyFunBean) {
             assert(bean != null)
             privacyFunBeanList.add(bean)

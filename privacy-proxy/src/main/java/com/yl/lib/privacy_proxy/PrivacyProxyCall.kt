@@ -1003,7 +1003,7 @@ open class PrivacyProxyCall {
             if (PrivacySentry.Privacy.inDangerousState(key)) {
                 PrivacyProxyUtil.Util.doFilePrinter(
                     key,
-                    methodDocumentDesc = "Serial",
+                    methodDocumentDesc = "getSerial",
                     bVisitorModel = true
                 )
                 return ""

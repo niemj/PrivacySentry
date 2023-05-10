@@ -33,7 +33,7 @@ class PrivacyFunBean {
     var count = 0
 
 
-    constructor(alias: String?, funName: String?, stackTrace: String?, count: Int) {
+    constructor(funName: String?, alias: String?, stackTrace: String?, count: Int) {
         appendTime = PrivacyUtil.Util.formatTime(System.currentTimeMillis(), "MM-dd HH:mm:ss.SSS")
         this.funAlias = alias
         this.funName = funName
@@ -61,6 +61,6 @@ class PrivacyFunBean {
         if (delIndex != null && delIndex <= 0) {
             return stackStrace
         }
-        return sArray?.subList(delIndex!!+1,sArray.size)?.joinToString(separator = "\n")
+        return sArray?.subList(delIndex!! + 1, sArray.size)?.joinToString(separator = "\n")
     }
 }

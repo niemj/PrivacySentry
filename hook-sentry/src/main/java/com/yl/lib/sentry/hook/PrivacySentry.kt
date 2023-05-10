@@ -196,7 +196,6 @@ class PrivacySentry {
          * 关闭游客模式
          */
         fun closeVisitorModel() {
-            PrivacyLog.i("closeVisitorModel")
             mBuilder?.configVisitorModel(false)
             mBuilder?.getPrinterList()?.forEach {
                 it.filePrint(
@@ -211,7 +210,6 @@ class PrivacySentry {
          * 打开游客模式
          */
         fun openVisitorModel() {
-            PrivacyLog.i("openVisitorModel")
             mBuilder?.configVisitorModel(true)
             mBuilder?.getPrinterList()?.forEach {
                 it.filePrint(
