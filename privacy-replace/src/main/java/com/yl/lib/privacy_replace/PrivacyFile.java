@@ -31,7 +31,7 @@ public class PrivacyFile extends File {
 
     public PrivacyFile(@Nullable File parent, @NonNull String child) {
         super(parent, child);
-        record(parent.getPath() + child);
+        record((parent == null ? "" : parent.getPath()) + child);
     }
 
     public PrivacyFile(@NonNull URI uri) {

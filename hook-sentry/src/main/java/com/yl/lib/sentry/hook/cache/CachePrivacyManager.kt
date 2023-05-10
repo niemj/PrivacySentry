@@ -2,6 +2,7 @@ package com.yl.lib.sentry.hook.cache
 
 import android.location.Location
 import android.text.TextUtils
+import com.yl.lib.sentry.hook.PrivacySentry
 import com.yl.lib.sentry.hook.util.PrivacyProxyUtil
 import java.io.File
 
@@ -91,7 +92,6 @@ class CachePrivacyManager {
             key: String,
             methodDocumentDesc: String,
             defaultValue: String,
-//            transform: ((value: T) -> T)? = null,
             getValue: () -> String
         ): String {
             var result = getCacheParam(key, defaultValue, PrivacyCacheType.PERMANENT_DISK)
@@ -106,7 +106,6 @@ class CachePrivacyManager {
         }
 
 
-
         private fun <T> handleData(
             key: String,
             methodDocumentDesc: String,
@@ -116,7 +115,7 @@ class CachePrivacyManager {
             cacheType: PrivacyCacheType,
             duration: Long = 0
         ): T {
-            if (cacheResult.first) {
+            if (cacheResult.first && PrivacySentry.Privacy.isLoadFromCache(key)) {
                 PrivacyProxyUtil.Util.doFilePrinter(key, methodDocumentDesc, bCache = true)
                 return cacheResult.second
             }
@@ -184,7 +183,11 @@ class CachePrivacyManager {
                         duration
                     )
                     PrivacyCacheType.PERMANENT_DISK -> dickCache.put(key, value.toString())
-                    PrivacyCacheType.TIMELINESS_DISK -> timeDiskCache.put(key, value.toString(),duration)
+                    PrivacyCacheType.TIMELINESS_DISK -> timeDiskCache.put(
+                        key,
+                        value.toString(),
+                        duration
+                    )
                 }
             }
         }
@@ -205,7 +208,6 @@ class CachePrivacyManager {
             }
             return false
         }
-
     }
 
 }

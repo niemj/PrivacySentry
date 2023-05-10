@@ -13,8 +13,9 @@ import androidx.annotation.RequiresApi
 import com.yl.lib.privacy_annotation.MethodInvokeOpcode
 import com.yl.lib.privacy_annotation.PrivacyClassProxy
 import com.yl.lib.privacy_annotation.PrivacyMethodProxy
-import com.yl.lib.sentry.hook.util.PrivacyProxyUtil.Util.doFilePrinter
 import com.yl.lib.sentry.hook.PrivacySentry
+import com.yl.lib.sentry.hook.PrivacySentryConstant
+import com.yl.lib.sentry.hook.util.PrivacyProxyUtil
 
 /**
  * @author yulun
@@ -42,10 +43,16 @@ open class PrivacyProxyResolver {
             projection: Array<String?>?, selection: String?,
             selectionArgs: Array<String?>?, sortOrder: String?
         ): Cursor? {
-            doFilePrinter("query", "查询服务: ${uriToLog(uri)}")
-//            if (PrivacySentry.Privacy.inDangerousState()) {
-//                return null
-//            }
+            var key = PrivacySentryConstant.CONTENTRESOLVER_QUERY
+            if (PrivacySentry.Privacy.inDangerousState(key)) {
+                PrivacyProxyUtil.Util.doFilePrinter(
+                    key,
+                    "查询服务: ${uriToLog(uri)}",
+                    bVisitorModel = true
+                )
+                return null
+            }
+            PrivacyProxyUtil.Util.doFilePrinter(key, "查询服务: ${uriToLog(uri)}")
             return contentResolver?.query(uri, projection, selection, selectionArgs, sortOrder)
         }
 
@@ -63,10 +70,16 @@ open class PrivacyProxyResolver {
             selectionArgs: Array<String?>?, sortOrder: String?,
             cancellationSignal: CancellationSignal?
         ): Cursor? {
-            doFilePrinter("query", "查询服务: ${uriToLog(uri)}")
-//            if (PrivacySentry.Privacy.inDangerousState()) {
-//                return null
-//            }
+            var key = PrivacySentryConstant.CONTENTRESOLVER_QUERY
+            if (PrivacySentry.Privacy.inDangerousState(key)) {
+                PrivacyProxyUtil.Util.doFilePrinter(
+                    key,
+                    "查询服务: ${uriToLog(uri)}",
+                    bVisitorModel = true
+                )
+                return null
+            }
+            PrivacyProxyUtil.Util.doFilePrinter(key, "查询服务: ${uriToLog(uri)}")
             return contentResolver?.query(
                 uri,
                 projection,
@@ -91,10 +104,16 @@ open class PrivacyProxyResolver {
             projection: Array<String?>?, queryArgs: Bundle?,
             cancellationSignal: CancellationSignal?
         ): Cursor? {
-            doFilePrinter("query", "查询服务: ${uriToLog(uri)}")
-//            if (PrivacySentry.Privacy.inDangerousState()) {
-//                return null
-//            }
+            var key = PrivacySentryConstant.CONTENTRESOLVER_QUERY
+            if (PrivacySentry.Privacy.inDangerousState(key)) {
+                PrivacyProxyUtil.Util.doFilePrinter(
+                    key,
+                    "查询服务: ${uriToLog(uri)}",
+                    bVisitorModel = true
+                )
+                return null
+            }
+            PrivacyProxyUtil.Util.doFilePrinter(key, "查询服务: ${uriToLog(uri)}")
             return contentResolver?.query(uri, projection, queryArgs, cancellationSignal)
         }
 
@@ -111,10 +130,16 @@ open class PrivacyProxyResolver {
             url: Uri,
             values: ContentValues?
         ): Uri? {
-            doFilePrinter("insert", "增加服务: ${uriToLog(url)}")
-//            if (PrivacySentry.Privacy.inDangerousState()) {
-//                return null
-//            }
+            var key = PrivacySentryConstant.CONTENTRESOLVER_INSERT
+            if (PrivacySentry.Privacy.inDangerousState(key)) {
+                PrivacyProxyUtil.Util.doFilePrinter(
+                    key,
+                    "增加服务: ${uriToLog(url)}",
+                    bVisitorModel = true
+                )
+                return null
+            }
+            PrivacyProxyUtil.Util.doFilePrinter(key, "增加服务: ${uriToLog(url)}")
             return contentResolver?.insert(url, values)
         }
 
@@ -131,10 +156,16 @@ open class PrivacyProxyResolver {
             url: Uri,
             values: ContentValues?, extras: Bundle?
         ): Uri? {
-            doFilePrinter("insert", "增加服务: ${uriToLog(url)}")
-//            if (PrivacySentry.Privacy.inDangerousState()) {
-//                return null
-//            }
+            var key = PrivacySentryConstant.CONTENTRESOLVER_INSERT
+            if (PrivacySentry.Privacy.inDangerousState(key)) {
+                PrivacyProxyUtil.Util.doFilePrinter(
+                    key,
+                    "增加服务: ${uriToLog(url)}",
+                    bVisitorModel = true
+                )
+                return null
+            }
+            PrivacyProxyUtil.Util.doFilePrinter(key, "增加服务: ${uriToLog(url)}")
             return contentResolver?.insert(url, values, extras)
         }
 
@@ -151,10 +182,16 @@ open class PrivacyProxyResolver {
             values: ContentValues?, where: String?,
             selectionArgs: Array<String?>?
         ): Int? {
-            doFilePrinter("update", "更新服务: ${uriToLog(uri)}")
-//            if (PrivacySentry.Privacy.inDangerousState()) {
-//                return -1
-//            }
+            var key = PrivacySentryConstant.CONTENTRESOLVER_UPDATE
+            if (PrivacySentry.Privacy.inDangerousState(key)) {
+                PrivacyProxyUtil.Util.doFilePrinter(
+                    key,
+                    "更新服务: ${uriToLog(uri)}",
+                    bVisitorModel = true
+                )
+                return -1
+            }
+            PrivacyProxyUtil.Util.doFilePrinter(key, "更新服务: ${uriToLog(uri)}")
             return contentResolver?.update(uri, values, where, selectionArgs)
         }
 
@@ -171,10 +208,16 @@ open class PrivacyProxyResolver {
             contentResolver: ContentResolver?, uri: Uri,
             values: ContentValues?, extras: Bundle?
         ): Int? {
-            doFilePrinter("update", "更新服务: ${uriToLog(uri)}")
-//            if (PrivacySentry.Privacy.inDangerousState()) {
-//                return -1
-//            }
+            var key = PrivacySentryConstant.CONTENTRESOLVER_UPDATE
+            if (PrivacySentry.Privacy.inDangerousState(key)) {
+                PrivacyProxyUtil.Util.doFilePrinter(
+                    key,
+                    "更新服务: ${uriToLog(uri)}",
+                    bVisitorModel = true
+                )
+                return -1
+            }
+            PrivacyProxyUtil.Util.doFilePrinter(key, "更新服务: ${uriToLog(uri)}")
             return contentResolver?.update(uri, values, extras)
         }
 
@@ -190,10 +233,16 @@ open class PrivacyProxyResolver {
             contentResolver: ContentResolver?, url: Uri, where: String?,
             selectionArgs: Array<String?>?
         ): Int? {
-            doFilePrinter("delete", "删除服务: ${uriToLog(url)}")
-//            if (PrivacySentry.Privacy.inDangerousState()) {
-//                return -1
-//            }
+            var key = PrivacySentryConstant.CONTENTRESOLVER_DELETE
+            if (PrivacySentry.Privacy.inDangerousState(key)) {
+                PrivacyProxyUtil.Util.doFilePrinter(
+                    key,
+                    "删除服务: ${uriToLog(url)}",
+                    bVisitorModel = true
+                )
+                return -1
+            }
+            PrivacyProxyUtil.Util.doFilePrinter(key, "删除服务: ${uriToLog(url)}")
             return contentResolver?.delete(url, where, selectionArgs)
         }
 
@@ -209,10 +258,16 @@ open class PrivacyProxyResolver {
         fun delete(
             contentResolver: ContentResolver?, url: Uri, extras: Bundle?
         ): Int? {
-            doFilePrinter("delete", "删除服务: ${uriToLog(url)}")
-//            if (PrivacySentry.Privacy.inDangerousState()) {
-//                return -1
-//            }
+            var key = PrivacySentryConstant.CONTENTRESOLVER_DELETE
+            if (PrivacySentry.Privacy.inDangerousState(key)) {
+                PrivacyProxyUtil.Util.doFilePrinter(
+                    key,
+                    "删除服务: ${uriToLog(url)}",
+                    bVisitorModel = true
+                )
+                return -1
+            }
+            PrivacyProxyUtil.Util.doFilePrinter(key, "删除服务: ${uriToLog(url)}")
             return contentResolver?.delete(url, extras)
         }
 

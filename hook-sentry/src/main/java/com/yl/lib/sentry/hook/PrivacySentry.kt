@@ -57,6 +57,10 @@ class PrivacySentry {
         private fun initInner(ctx: Application) {
             PrivacyLog.i("call initInner")
             this.ctx = ctx
+            //添加默认缓存状态函数列表
+            mBuilder?.addLoadCacheList(defaultLoadCacheState(), false)
+            //添加默认白名单敏感函数列表
+            mBuilder?.addWhiteMethods(defaultWhiteMethodsList(), false)
             if (mBuilder?.isEnableFileResult() == true || mBuilder?.debug == true) {
                 if (mBuilder?.isEnableFileResult() == true) {
                     mBuilder?.getWatchTime()?.let {
@@ -151,11 +155,33 @@ class PrivacySentry {
             return mBuilder ?: null
         }
 
-        fun inDangerousState(): Boolean {
-            if (getBuilder()?.isVisitorModel() == true) {
+        fun inDangerousState(key: String): Boolean {
+            // 游客模式白名单
+            if (isWhiteMethod(key)) {
+                return false
+            }
+            // 未同意隐私协议
+            if (!hasShowPrivacy()) {
                 return true
             }
-            return !hasShowPrivacy()
+            // 游客模式
+            if (mBuilder?.isVisitorModel() == true) {
+                return true
+            }
+            // 危险函数
+            if (isDangerousMethod(key)) {
+                return true
+            }
+            return false
+        }
+
+        fun isLoadFromCache(method: String): Boolean {
+            for (item in mBuilder?.getLoadCacheList()!!) {
+                if (method.contains(item.first)) {
+                    return item.second
+                }
+            }
+            return true
         }
 
         /**
@@ -170,16 +196,76 @@ class PrivacySentry {
          * 关闭游客模式
          */
         fun closeVisitorModel() {
+            PrivacyLog.i("closeVisitorModel")
             mBuilder?.configVisitorModel(false)
+            mBuilder?.getPrinterList()?.forEach {
+                it.filePrint(
+                    "closeVisitorModel",
+                    "关闭游客模式",
+                    "关闭游客模式"
+                )
+            }
         }
 
         /**
          * 打开游客模式
          */
         fun openVisitorModel() {
+            PrivacyLog.i("openVisitorModel")
             mBuilder?.configVisitorModel(true)
+            mBuilder?.getPrinterList()?.forEach {
+                it.filePrint(
+                    "openVisitorModel",
+                    "打开游客模式",
+                    "打开游客模式"
+                )
+            }
         }
 
+        /**
+         * 是否用缓存返回的函数列表(不使用缓存返回)
+         */
+        private fun defaultLoadCacheState(): List<Pair<String, Boolean>> {
+            val list = ArrayList<Pair<String, Boolean>>()
+            //放开bssid ,ssdid的缓存，这个会导致腾讯定位出问题
+            list.add(Pair(PrivacySentryConstant.WIFIINFO_GETSSID, false))
+            list.add(Pair(PrivacySentryConstant.WIFIINFO_GETBSSID, false))
+            list.add(Pair(PrivacySentryConstant.WIFIINFO_GETIPADDRESS, false))
+            //放开wifiEnable缓存，不再走缓存判断
+            list.add(Pair(PrivacySentryConstant.WIFIMANAGER_ISWIFIENABLED, false))
+            return list
+        }
+
+        /**
+         * 游客模式白名单（仅代理）
+         */
+        private fun defaultWhiteMethodsList(): List<String> {
+            val list = ArrayList<String>()
+            //权限请求
+            list.add(PrivacySentryConstant.REQUESTPERMISSIONS)
+            //游客返回null,有风险
+            list.add(PrivacySentryConstant.WIFIMANAGER_GETDHCPINFO)
+            //ip地址只做代理，不再拦截
+            list.add(PrivacySentryConstant.INET4ADDRESS_GETADDRESS)
+            list.add(PrivacySentryConstant.INETADDRESS_GETADDRESS)
+            list.add(PrivacySentryConstant.INET4ADDRESS_GETHOSTADDRESS)
+            list.add(PrivacySentryConstant.INETADDRESS_GETHOSTADDRESS)
+            //contentResolver的方法，只做代理，不再拦截
+            list.add(PrivacySentryConstant.CONTENTRESOLVER_QUERY)
+            list.add(PrivacySentryConstant.CONTENTRESOLVER_INSERT)
+            list.add(PrivacySentryConstant.CONTENTRESOLVER_UPDATE)
+            list.add(PrivacySentryConstant.CONTENTRESOLVER_DELETE)
+            //Location游客返回null,有风险
+            list.add(PrivacySentryConstant.LOCATIONMANAGER_GETLASTKNOWNLOCATION)
+            //sdk根目录游客返回null,有风险
+            list.add(PrivacySentryConstant.ENVIRONMENT_GETEXTERNALSTORAGEDIRECTORY)
+            //放开package信息读取,只做代理，不再拦截
+            list.add(PrivacySentryConstant.PACKAGEMANAGER_GETPACKAGEINFO)
+            list.add(PrivacySentryConstant.PACKAGEMANAGER_GETINSTALLEDPACKAGESASUSER)
+            list.add(PrivacySentryConstant.PACKAGEMANAGER_GETINSTALLEDAPPLICATIONS)
+            list.add(PrivacySentryConstant.PACKAGEMANAGER_GETINSTALLEDAPPLICATIONSASUSER)
+            return list
+        }
 
         private fun defaultFilePrinter(
             ctx: Context,
@@ -208,6 +294,24 @@ class PrivacySentry {
             )
         }
 
+        private fun isWhiteMethod(method: String): Boolean {
+            for (item in mBuilder?.getWhiteMethodsList()!!) {
+                if (method.contains(item)) {
+                    return true
+                }
+            }
+            return false
+        }
+
+        private fun isDangerousMethod(method: String): Boolean {
+            for (item in mBuilder?.getDangerousList()!!) {
+                if (method.contains(item)) {
+                    return true
+                }
+            }
+            return false
+        }
+
     }
 }
 
@@ -216,4 +320,14 @@ class PrivacySentry {
  */
 public interface PrivacyResultCallBack {
     fun onResultCallBack(filePath: String)
+}
+
+/**
+ * 游客模式回调，业务方自行处理
+ */
+public interface VisitorModelCallBack {
+    fun onVisitorCallBack(
+        funName: String,
+        methodDocumentDesc: String = "", msg: String = ""
+    )
 }

@@ -9,6 +9,7 @@ import com.yl.lib.privacy_annotation.MethodInvokeOpcode
 import com.yl.lib.privacy_annotation.PrivacyClassProxy
 import com.yl.lib.privacy_annotation.PrivacyMethodProxy
 import com.yl.lib.sentry.hook.PrivacySentry
+import com.yl.lib.sentry.hook.PrivacySentryConstant
 import com.yl.lib.sentry.hook.cache.CachePrivacyManager
 import com.yl.lib.sentry.hook.util.PrivacyProxyUtil
 
@@ -108,17 +109,18 @@ open class PrivacySensorProxy {
         )
         @JvmStatic
         fun getSensorList(sensorManager: SensorManager?, type: Int): List<Sensor>? {
+            var key = PrivacySentryConstant.SENSORMANAGER_GETSENSORLIST + "-$type"
             var logPair = transformSensorTypeToString(type)
-            if (PrivacySentry.Privacy.inDangerousState()) {
+            if (PrivacySentry.Privacy.inDangerousState(key)) {
                 PrivacyProxyUtil.Util.doFilePrinter(
-                    "getSensorList-$type",
+                    key,
                     "获取${logPair.first}-${logPair.second}",
                     bVisitorModel = true
                 )
                 return emptyList()
             }
             return CachePrivacyManager.Manager.loadWithMemoryCache<List<Sensor>>(
-                "getSensorList-$type",
+                key,
                 "获取${logPair.first}-${logPair.second}",
                 emptyList()
             ) {
@@ -128,6 +130,7 @@ open class PrivacySensorProxy {
 
         @JvmStatic
         private fun logSensorManager(sensor: Sensor?) {
+            var key = PrivacySentryConstant.SENSORMANAGER_REGISTERLISTENER
             sensor?.let {
                 var sensorType: String? = ""
                 var sensorDesc: String? = ""
@@ -135,7 +138,7 @@ open class PrivacySensorProxy {
                 sensorType = logPair.first
                 sensorDesc = logPair.second
                 PrivacyProxyUtil.Util.doFilePrinter(
-                    "registerListener",
+                    key,
                     methodDocumentDesc = "注册-${sensorType}传感器,$sensorDesc"
                 )
             }

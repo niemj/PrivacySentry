@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment
 import com.yl.lib.privacy_annotation.MethodInvokeOpcode
 import com.yl.lib.privacy_annotation.PrivacyClassProxy
 import com.yl.lib.privacy_annotation.PrivacyMethodProxy
+import com.yl.lib.sentry.hook.PrivacySentry
+import com.yl.lib.sentry.hook.PrivacySentryConstant
 import com.yl.lib.sentry.hook.util.PrivacyProxyUtil
 import com.yl.lib.sentry.hook.util.ReflectUtils
 
@@ -32,13 +34,22 @@ class PrivacyPermissionProxy {
             ignoreClass = true
         )
         fun requestPermissionsSuper(obj: Any, permissions: Array<String?>, requestCode: Int) {
+            var key = PrivacySentryConstant.REQUESTPERMISSIONS
+            if (PrivacySentry.Privacy.inDangerousState(key)) {
+                PrivacyProxyUtil.Util.doFilePrinter(
+                    key,
+                    methodDocumentDesc = "${obj.javaClass.name}-INVOKESPECIAL-请求权限，权限列表：${permissions?.contentToString()}",
+                    bVisitorModel = true
+                )
+                return
+            }
             PrivacyProxyUtil.Util.doFilePrinter(
-                "requestPermissions",
+                key,
                 methodDocumentDesc = "${obj.javaClass.name}-INVOKESPECIAL-请求权限，权限列表：${permissions?.contentToString()}"
             )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 ReflectUtils.Utils.invokeMethod<Unit>(
-                    obj, "requestPermissions", arrayOf(
+                    obj, key, arrayOf(
                         Array<String>::class.java, Integer.TYPE
                     ), arrayOf<Any?>(permissions, requestCode)
                 )
@@ -56,8 +67,17 @@ class PrivacyPermissionProxy {
             ignoreClass = true
         )
         fun requestPermissions(any: Any, permissions: Array<String?>, requestCode: Int) {
+            var key = PrivacySentryConstant.REQUESTPERMISSIONS
+            if (PrivacySentry.Privacy.inDangerousState(key)) {
+                PrivacyProxyUtil.Util.doFilePrinter(
+                    key,
+                    methodDocumentDesc = "${any.javaClass.name}-INVOKEVIRTUAL-请求权限，权限列表：${permissions?.contentToString()}",
+                    bVisitorModel = true
+                )
+                return
+            }
             PrivacyProxyUtil.Util.doFilePrinter(
-                "requestPermissions",
+                key,
                 methodDocumentDesc = "${any.javaClass.name}-INVOKEVIRTUAL-请求权限，权限列表：${permissions?.contentToString()}"
             )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -69,7 +89,7 @@ class PrivacyPermissionProxy {
                     any.requestPermissions(permissions, requestCode)
                 } else {
                     ReflectUtils.Utils.invokeMethod<Unit>(
-                        any, "requestPermissions", arrayOf(
+                        any, key, arrayOf(
                             Array<String>::class.java, Integer.TYPE
                         ), arrayOf<Any?>(permissions, requestCode)
                     )
