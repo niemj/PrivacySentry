@@ -82,7 +82,7 @@ class DefaultFilePrint : BaseFilePrinter {
     override fun appendData(funName: String, funAlias: String, msg: String) {
         if (funName == null || funAlias == null)
             return
-        PrivacyDataManager.Manager.addData(PrivacyFunBean(funAlias, funName, msg, 1))
+        PrivacyDataManager.Manager.addData(PrivacyFunBean(funName, funAlias, msg, 1))
     }
 
     private fun flushSheetPrivacyCount(funBeanList: ArrayList<PrivacyFunBean>) {
